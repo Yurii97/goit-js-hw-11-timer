@@ -1,10 +1,25 @@
-const timer = new CountdownTimer({
-  selector: '#timer-1',
-  targetDate: new Date('01/01/2022'),
-});
+const addTimerButtonRef = document.querySelector('#add-time')
 
-function template({ days, hours, mins, secs }) {
-  return `<div class="field">
+addTimerButtonRef.addEventListener('click', addTimer)
+
+function addTimer() {
+  const timeId = Date.now();
+  const timer = new CountdownTimer({
+    selector: '#timer',
+    timeId: timeId,
+    targetDate: new Date(prompt('Please enter date: day/month/year')),
+  })
+}
+
+// const timer = new CountdownTimer({
+//   selector: '#timer-1',
+//   targetDate: new Date('01/01/2022'),
+// });
+
+function template({ days, hours, mins, secs, planeDate }) {
+  return `<div class="f">
+  <span>${planeDate} залишилось:</span>
+  <div class="field">
         <span class="value" data-value="days">${days}</span>
         <span class="label">Days</span>
       </div>
@@ -19,13 +34,14 @@ function template({ days, hours, mins, secs }) {
       <div class="field">
         <span class="value" data-value="secs">${secs}</span>
         <span class="label">Seconds</span>
-      </div>`
+      </div>
+      </div>`  
 }
 let deltaTime = null;
 
 function CountdownTimer({ selector, targetDate }) {
-  document.querySelector(`${selector}`).insertAdjacentHTML('beforeend', template(getTimeComponents(0)));
-  // console.log(timerValue);
+  document.querySelector(`${selector}`).insertAdjacentHTML('beforeend', template(getTimeComponents(targetDate)));
+  console.log(targetDate);
   setInterval(() => {
     const curuntDate = Date.now();
     deltaTime = targetDate - curuntDate;
@@ -37,21 +53,14 @@ function pad(value) {
   return String(value).padStart(2, '0');
 }
 
-function getTimeComponents(time) {
-  // const timerValue = document.querySelectorAll('.value');
-  // console.log(timerValue.target.dataset.value);
+function getTimeComponents(time) { 
   const days = pad(Math.floor(time / (1000 * 60 * 60 * 24)));
-  changeValue('days', days)
-  // document.querySelector('[data-value="days"]').textContent=days; 
   const hours = pad(Math.floor((time % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)));
   const mins = pad(Math.floor((time % (1000 * 60 * 60)) / (1000 * 60)));
   const secs = pad(Math.floor((time % (1000 * 60)) / 1000));
-  // document.querySelector('[data-value="secs"]').textContent
-  // console.log(document.querySelector(`[data-value="secs"]`));
-  return { days, hours, mins, secs }
+  let planeDate = 'До: ';
+  planeDate += time.getFullYear() + '/';
+  planeDate += time.getMonth()+ '/';
+  planeDate += time.getDate();
+  return { days, hours, mins, secs, planeDate }
 }
-
-function changeValue(name, el) {
-  const valueRef = document.querySelector(`[data-value="${name}"]`);
-  console.log(valueRef);
-  valueRef.insertAdjacentText('beforeend', el);
